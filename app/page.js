@@ -15,18 +15,13 @@ export default function Home() {
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [unit, setUnit] = useState("metric");
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+
 
   const API_KEY = "a58ede03533fc91eae362e91092f17c5";
 
-  // Memoized background style calculation
-  const getBackgroundStyle = useCallback(() => {
-    if (!weather) return "from-sky-200 to-blue-400";
-    const temp = weather?.main?.temp;
-    if (temp > 30) return "from-orange-400 to-red-500 via-orange-300";
-    if (temp > 20) return "from-yellow-200 to-orange-300 via-yellow-100";
-    if (temp > 10) return "from-sky-300 to-blue-400 via-sky-200";
-    return "from-cyan-200 to-blue-300 via-cyan-100";
-  }, [weather]);
+
 
   useEffect(() => {
     const getLocation = async () => {
@@ -129,6 +124,40 @@ export default function Home() {
     setHistory([]); // ensure UI updates
     toast.info("Search history cleared");
   };
+  useEffect(() => {
+    const savedMode = localStorage.getItem('darkMode') === 'true';
+    setIsDarkMode(savedMode);
+    if (savedMode) {
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem('darkMode', newMode);
+    document.documentElement.classList.toggle('dark', newMode);
+  };
+
+  // Update background style calculation
+  const getBackgroundStyle = useCallback(() => {
+    if (isDarkMode) {
+      if (!weather) return "from-gray-800 to-gray-900";
+      const temp = weather?.main?.temp;
+      if (temp > 30) return "from-gray-800 to-gray-900";
+      if (temp > 20) return "from-gray-800 to-gray-900";
+      if (temp > 10) return "from-gray-800 to-gray-900";
+      return "from-cyan-800 to-blue-900 via-cyan-700";
+    } else {
+      // Existing light mode logic
+      if (!weather) return "from-sky-200 to-blue-400";
+      const temp = weather?.main?.temp;
+      if (temp > 30) return "from-sky-200 to-blue-400";
+      if (temp > 20) return "from-sky-200 to-blue-400";
+      if (temp > 10) return "from-sky-300 to-blue-400";
+      return "from-cyan-200 to-blue-300 via-cyan-100";
+    }
+  }, [weather, isDarkMode]);
 
 
   return (
@@ -137,9 +166,17 @@ export default function Home() {
       <ToastContainer position="top-right" autoClose={3000} />
       <nav className="w-full max-w-xl mb-6 flex justify-between items-center text-white">
         <h1 className="text-2xl font-bold">🌤️ WeatherApp</h1>
-        <Link href="/about" className="text-sm underline hover:text-white/80 transition-colors">
-          About
-        </Link>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={toggleDarkMode}
+            className="text-2xl hover:opacity-80 transition-opacity"
+          >
+            {isDarkMode ? '🌞' : '🌙'}
+          </button>
+          <Link href="/about" className="text-sm underline hover:text-white/80 transition-colors">
+            About
+          </Link>
+        </div>
       </nav>
 
       <div className="w-full max-w-xl px-4 space-y-6">
@@ -195,7 +232,7 @@ function SearchBar({ query, setQuery, fetchWeather, showHistory, setShowHistory,
           onFocus={() => setShowHistory(true)}
           onBlur={() => setTimeout(() => setShowHistory(false), 200)}
           placeholder="Search city..."
-          className="w-full px-6 py-4 rounded-2xl border-0 shadow-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-lg placeholder-gray-600 backdrop-blur-sm bg-white/90 pr-16"
+          className="w-full px-6 py-4 rounded-2xl border-0 shadow-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-lg placeholder-gray-600 dark:placeholder-gray-300 backdrop-blur-sm bg-white/90 dark:bg-gray-700/90 pr-16"
           onKeyPress={(e) => e.key === "Enter" && !loading && fetchWeather(null, null, query)}
         />
 
@@ -218,7 +255,7 @@ function SearchBar({ query, setQuery, fetchWeather, showHistory, setShowHistory,
 
       {showHistory && history?.length > 0 && (
 
-        <div className="absolute z-10 w-full mt-2 bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-2xl shadow-lg p-4 animate-fade-in-up">
+        <div className="absolute z-10 w-full mt-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200/50 dark:border-gray-600/50 rounded-2xl shadow-lg p-4 animate-fade-in-up">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-sm font-semibold text-gray-600">Recent Searches</h3>
             <button
@@ -241,7 +278,7 @@ function SearchBar({ query, setQuery, fetchWeather, showHistory, setShowHistory,
                   setTimeout(() => fetchWeather(null, null, entry.city), 0);
                 }}
 
-                className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-xl transition-colors flex justify-between items-center"
+                className="w-full px-4 py-2 text-left text-white hover:bg-gray-100 rounded-xl transition-colors flex justify-between items-center"
               >
                 <span>{entry.city}</span>
                 <span className="text-xs text-gray-400">
@@ -258,10 +295,10 @@ function SearchBar({ query, setQuery, fetchWeather, showHistory, setShowHistory,
 
 function WeatherCard({ weather, city, unit }) {
   return (
-    <div className="bg-white/90 backdrop-blur-sm p-8 rounded-2xl shadow-2xl animate-fade-in-up">
+    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-8 rounded-2xl shadow-2xl animate-fade-in-up">
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         <div className="text-center md:text-left">
-          <h2 className="text-3xl font-bold text-gray-800 flex items-center justify-center md:justify-start gap-2">
+          <h2 className="text-3xl font-bold text-white flex items-center justify-center md:justify-start gap-2">
             {city}
             <span className="text-lg font-normal text-gray-500">
               ({weather.sys.country})

@@ -26,10 +26,10 @@ export default function DetailsClient() {
   }, [weatherData]);
 
   const getTemperatureStyle = (temp) => {
-    if (temp > 30) return "from-orange-400 to-red-500";
-    if (temp > 20) return "from-yellow-200 to-orange-300";
-    if (temp > 10) return "from-sky-300 to-blue-400";
-    return "from-cyan-200 to-blue-300";
+    if (temp > 30) return "from-gray-800 to-gray-900";
+    if (temp > 20) return "from-gray-800 to-gray-900";
+    if (temp > 10) return "from-gray-800 to-gray-900";
+    return "from-gray-800 to-gray-900";
   };
 
   const handleRefresh = () => {
