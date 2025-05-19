@@ -20,8 +20,8 @@ export default function AboutPage() {
         <ul className="list-disc list-inside text-gray-600 space-y-2">
           <li>Get weather by your geolocation or search any city worldwide.</li>
           <li>See details like temperature, humidity, pressure, wind speed, visibility, and more.</li>
-          <li>Data is fetched live from the OpenWeather API using your browser's fetch API.</li>
-          <li>Recent searches are stored in your browser's localStorage for quick access.</li>
+          <li>Data is fetched live from the OpenWeather API using your browser&apos;s fetch API.</li>
+          <li>Recent searches are stored in your browser&apos;s localStorage for quick access.</li>
         </ul>
 
         <p className="text-gray-600 text-sm">
